@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../reducers/authReducer';
+import { logout, updateProfile } from '../reducers/authReducer';
 import UserLocationMap from './UserLocationMap';
 
 const Home = () => {
@@ -34,8 +34,7 @@ const Home = () => {
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
-    // You could send an API request here to update the user's profile in the database
-    alert('Profile updated!');
+    dispatch(updateProfile( name, email , token));
   };
 
   return (

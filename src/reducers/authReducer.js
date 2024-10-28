@@ -17,6 +17,9 @@ const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
 const REGISTER_FAILURE = 'REGISTER_FAILURE';
 const LOGOUT = 'LOGOUT';
 const UPDATE_PROFILE = 'UPDATE_PROFILE';
+const UPDATE_PROFILE_REQUEST = 'UPDATE_PROFILE_REQUEST';
+const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
+const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 
 // Reducer
 function authReducer(state = initialState, action) {
@@ -83,6 +86,36 @@ export const registerUser = (name, email, password,confirmed_password, user_type
   }
 };
 
+export const updateProfile = (name, email, token) => async (dispatch) => {
+  dispatch({ type: UPDATE_PROFILE_REQUEST });
+
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/update-profile', {
+      name,
+      email,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Update user data in localStorage
+    const updatedUser = { ...response.data.data };
+
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    dispatch({
+      type: UPDATE_PROFILE_SUCCESS,
+      payload: updatedUser,
+    });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_PROFILE_FAILURE,
+      payload: error.response?.data.message || 'Profile update failed.',
+    });
+  }
+};
+
 export const logout = () => {
   // Clear localStorage on logout
   localStorage.removeItem('user');
@@ -92,7 +125,6 @@ export const logout = () => {
     type: 'LOGOUT',
   };
 };
-export const updateProfile = (updatedData) => ({ type: UPDATE_PROFILE, payload: updatedData });
 
 // Export reducer
 export default authReducer;
