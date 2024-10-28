@@ -66,9 +66,9 @@ export const loginUser = (email, password) => async (dispatch) => {
   }
 };
 
-export const registerUser = (name, email, password, userType) => async (dispatch) => {
+export const registerUser = (name, email, password,confirmed_password, user_type) => async (dispatch) => {
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api/register', { name, email, password, userType });
+    const response = await axios.post('http://127.0.0.1:8000/api/register', { name, email, password, user_type, confirmed_password });
     const userData = response.data; // Assuming user data is in response.data
     dispatch({ type: REGISTER_SUCCESS, payload: userData });
   } catch (error) {
