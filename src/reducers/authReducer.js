@@ -1,12 +1,15 @@
 import axios from 'axios';
 
 // Initial State
-const initialState = {
-  isAuthenticated: false,
-  user: null,
-  error: null, // Store error messages from API
-};
+const userFromStorage = localStorage.getItem('user');
+const tokenFromStorage = localStorage.getItem('token');
 
+const initialState = {
+  isAuthenticated: !!tokenFromStorage,
+  user: userFromStorage ? JSON.parse(userFromStorage) : null,
+  token: tokenFromStorage,
+  error: null,
+};
 // Action Types
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 const LOGIN_FAILURE = 'LOGIN_FAILURE';
@@ -60,6 +63,10 @@ export const loginUser = (email, password) => async (dispatch) => {
   try {
     const response = await axios.post('http://127.0.0.1:8000/api/login', { email, password });
     const userData = response.data; // Assuming user data is in response.data
+
+    localStorage.setItem('user', JSON.stringify(response.data.data.user));
+    localStorage.setItem('token', response.data.data.token);
+
     dispatch({ type: LOGIN_SUCCESS, payload: userData });
   } catch (error) {
     dispatch({ type: LOGIN_FAILURE, payload: error.response?.data?.message || 'Login failed' });
@@ -76,7 +83,15 @@ export const registerUser = (name, email, password,confirmed_password, user_type
   }
 };
 
-export const logout = () => ({ type: LOGOUT });
+export const logout = () => {
+  // Clear localStorage on logout
+  localStorage.removeItem('user');
+  localStorage.removeItem('token');
+
+  return {
+    type: 'LOGOUT',
+  };
+};
 export const updateProfile = (updatedData) => ({ type: UPDATE_PROFILE, payload: updatedData });
 
 // Export reducer
